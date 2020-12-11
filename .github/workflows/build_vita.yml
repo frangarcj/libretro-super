@@ -1,0 +1,49 @@
+  
+name: VITA - Nightly
+
+on:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: "0 0 * * *"
+  repository_dispatch:
+    types: [run_build]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: vitasdk/vitasdk:latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: |
+        apk add build-base zip bash git imagemagick p7zip util-linux
+        
+    - name: Build project
+      run: |
+        JOBS=`nproc` bash ./libretro-buildbot-recipe.sh recipes/playstation/vita
+        ls retroarch/pkg/vita/vpk
+        echo 'BUILDBOT TASK: packaging cores'
+        CORE_DIR=retroarch/pkg/vita/vpk
+        DEST=`pwd`/out
+        mkdir -p $DEST
+        cd $CORE_DIR
+        find ../ -name '*.vpk' -exec bash -c 'cd {} && cd vpk && zip -r {}.zip *' \;
+        find ../ -type f -name "*.zip" -exec cp -v {} ./ \;
+        find ./ -name "*.vpk.zip" -exec rename .vpk.zip .vpk {} \;
+        cd ..
+        cp vpk/retroarch.vpk $DEST/RetroArch.vpk
+        cp -f vpk/retroarch.vpk $DEST/RetroArch.vpk
+        7z a -mx9 $DEST/RetroArch_data.7z retroarch
+        
+    - name: Upload release artifacts
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: out/*
+        overwrite: true
+        file_glob: true
+        tag: nightly
+        release_name: "VITA - Nightly"
