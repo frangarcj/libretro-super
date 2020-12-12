@@ -19,6 +19,12 @@ jobs:
       run: |
         apk add build-base zip bash git imagemagick p7zip util-linux
         
+    - name: Cache multiple paths
+      uses: actions/cache@v2
+      with:
+        path: libretro*
+        key: ${{ runner.os }}
+        
     - name: Build project
       run: |
         JOBS=`nproc` bash ./libretro-buildbot-recipe.sh recipes/playstation/vita
