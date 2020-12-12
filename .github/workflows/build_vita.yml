@@ -3,8 +3,6 @@ name: VITA - Nightly
 
 on:
   push:
-    branches:
-      - master
   schedule:
     - cron: "0 0 * * *"
   repository_dispatch:
@@ -47,3 +45,10 @@ jobs:
         file_glob: true
         tag: nightly
         release_name: "VITA - Nightly"
+        
+    - name: Upload artifacts
+      if: ${{ success() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: Retroarch.vpk
+        path: retroarch/pkg/vita/retroarch.vpk/vpk/*
