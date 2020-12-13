@@ -19,8 +19,17 @@ jobs:
 
     - name: Install dependencies
       run: |
-        apk add build-base zip bash git imagemagick p7zip util-linux
+        apk add build-base zip bash git imagemagick p7zip util-linux tar
         
+    - name: Cache multiple paths
+      uses: actions/cache@v2
+      with:
+        path: |
+          libretro*
+          retroarch
+          !retroarch/pkg/vita/vpk
+        key: ${{ runner.os }}
+
     - name: Build project
       run: |
         JOBS=`nproc` bash ./libretro-buildbot-recipe.sh recipes/playstation/vita
@@ -47,3 +56,10 @@ jobs:
         file_glob: true
         tag: nightly
         release_name: "VITA - Nightly"
+
+    - name: Upload artifacts
+      if: ${{ success() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: Retroarch.vpk
+        path: retroarch/pkg/vita/retroarch.vpk/vpk/*
