@@ -17,7 +17,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        apk add build-base zip bash git imagemagick p7zip util-linux
+        apk add build-base zip bash git imagemagick p7zip util-linux tar
         
     - name: Cache multiple paths
       uses: actions/cache@v2
@@ -49,8 +49,8 @@ jobs:
         file: out/*
         overwrite: true
         file_glob: true
-        tag: nightly
-        release_name: "VITA - Nightly"
+        tag: test
+        release_name: TEST
         
     - name: Upload artifacts
       if: ${{ success() }}
