@@ -22,7 +22,10 @@ jobs:
     - name: Cache multiple paths
       uses: actions/cache@v2
       with:
-        path: libretro*
+        path: |
+          libretro*
+          retroarch
+          !retroarch/pkg/vita/vpk
         key: ${{ runner.os }}
         
     - name: Build project
