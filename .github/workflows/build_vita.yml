@@ -26,9 +26,10 @@ jobs:
       with:
         path: |
           libretro*
+          dist
           retroarch
           !retroarch/pkg/vita/vpk
-        key: ${{ runner.os }}
+        key: "retroarch"
 
     - name: Build project
       run: |
